@@ -8,6 +8,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node dist/server.js",
+    "debug": "node --inspect-brk dist/server.js",
     "dev": "nodemon",
     "build": "tsc"
   },

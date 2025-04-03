@@ -21,10 +21,69 @@ export const successResponse = <T>(
 
 export const errorResponse = <T>(
     res: Response,
-    message: string,
+    message: string = '',
     error: any = null,
-    statusCode: number = 400
+    statusCode: number = 0
 ): Response<ErrorResponse<T>> => {
+    console.error(`[ERROR] ${error}`);
+
+    // Set default status code and message
+    statusCode = statusCode || error?.statusCode || 500;
+    message = statusCode === 500 ? "Internal Server Error" : message || error?.message || "Internal Server Error";
+
+    // MongoDB Validation Error Handling
+    if (error?.name === "ValidationError") {
+        statusCode = 400;
+        message = "Invalid Data Provided";
+    }
+
+    // MongoDB Duplicate Key Error
+    if (error?.code === 11000) {
+        statusCode = 400;
+        message = "Duplicate Key Error";
+    }
     const response: ErrorResponse<T> = { statusCode, message, error };
+
     return res.status(statusCode).json(response);
 };
+
+
+
+/**
+ * Express Error Handling Middleware
+ */
+const errorMiddleware = (
+    err: any,
+    req: Request,
+    res: Response,
+    next: Function
+) => {
+    console.error(`[ERROR] ${err.message}`);
+
+    // Set default status code and message
+    let statusCode = err.statusCode || 500;
+    let message = err.message || "Internal Server Error";
+
+    // MongoDB Validation Error Handling
+    if (err.name === "ValidationError") {
+        statusCode = 400;
+        message = "Invalid Data Provided";
+    }
+
+    // MongoDB Duplicate Key Error
+    if (err.code === 11000) {
+        statusCode = 400;
+        message = "Duplicate Key Error";
+    }
+
+    // Send JSON Response
+    res.status(statusCode).json({
+        success: false,
+        statusCode,
+        message,
+        errors: err.errors || null,
+    });
+    next()
+};
+
+export default errorMiddleware;
