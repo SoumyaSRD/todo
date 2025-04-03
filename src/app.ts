@@ -1,12 +1,20 @@
 import cors from "cors";
 import express from "express";
+import DefaultRouter from "./app.routes";
 import connectDB from "./config/dbconfig"; // Ensure default export in dbconfig.ts
-import DefaultRouter from "./routes/default.route"; // Ensure DefaultRouter is a Router
+import { setupSwagger } from "./module/shared/middlewares/swagger.middleware";
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// Apply CORS Middleware with Proper Configuration
+app.use(cors({
+    origin: "http://localhost:3000", // Replace with your frontend URL (e.g., "http://localhost:3000" for dev)
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Include OPTIONS for preflight requests
+    allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+    credentials: true, // Enable if your app uses credentials; otherwise, remove this line
+}));
+
+// Middleware to parse JSON request bodies
 app.use(express.json());
 
 // Connect to MongoDB
@@ -14,7 +22,10 @@ app.use(express.json());
     await connectDB();
 })();
 
+// Setup Swagger API Docs
+setupSwagger(app);
+
 // Routes
-app.use("/", DefaultRouter); // ✅ Use `use()` for routers
+app.use("/", DefaultRouter);
 
 export default app;
