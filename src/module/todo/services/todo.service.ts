@@ -1,6 +1,4 @@
-// src/services/todo.service.ts
 import { ITodo } from "../interfaces/todo.interface";
-
 import { TodoRepository } from "../repositories/todo.repository";
 import { ITodoService } from "./ITodo.service";
 
@@ -16,7 +14,7 @@ export class TodoService implements ITodoService {
             return await this.todoRepo.create(todo);
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-            throw new Error(`Error creating todo: ${errorMessage}`);
+            throw new Error(`Failed to create todo: ${errorMessage}`);
         }
     }
 
@@ -25,7 +23,7 @@ export class TodoService implements ITodoService {
             return await this.todoRepo.findAll();
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-            throw new Error(`Error fetching todos: ${errorMessage}`);
+            throw new Error(`Failed to fetch todos: ${errorMessage}`);
         }
     }
 
@@ -36,7 +34,7 @@ export class TodoService implements ITodoService {
             return todo;
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-            throw new Error(`Error retrieving todo: ${errorMessage}`);
+            throw new Error(`Failed to retrieve todo: ${errorMessage}`);
         }
     }
 
@@ -47,7 +45,7 @@ export class TodoService implements ITodoService {
             return updatedTodo;
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-            throw new Error(`Error updating todo: ${errorMessage}`);
+            throw new Error(`Failed to update todo: ${errorMessage}`);
         }
     }
 
@@ -58,7 +56,7 @@ export class TodoService implements ITodoService {
             return deletedTodo;
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-            throw new Error(`Error deleting todo: ${errorMessage}`);
+            throw new Error(`Failed to delete todo: ${errorMessage}`);
         }
     }
 }

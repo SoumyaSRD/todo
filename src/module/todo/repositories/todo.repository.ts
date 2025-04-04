@@ -1,17 +1,10 @@
 // src/repositories/todo.repository.ts
-import mongoose, { Model, Schema } from "mongoose";
+import { IRepository } from "../../shared/interfaces/IRepository";
 import { ITodo } from "../interfaces/todo.interface";
-import { ITodoRepository } from "./ITodo.repository";
+import { TodoModel } from "../models/todo.model";
 
-const todoSchema = new Schema<ITodo>({
-    title: { type: String, required: true },
-    description: { type: String },
-    completed: { type: Boolean, default: false },
-});
 
-const TodoModel: Model<ITodo> = mongoose.model<ITodo>("Todo", todoSchema);
-
-export class TodoRepository implements ITodoRepository {
+export class TodoRepository implements IRepository<ITodo> {
     async create(todo: ITodo): Promise<ITodo> {
         const newTodo = new TodoModel(todo);
         return await newTodo.save();

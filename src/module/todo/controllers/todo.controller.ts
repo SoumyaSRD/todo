@@ -1,4 +1,3 @@
-// src/controllers/todo.controller.ts
 import { Request, Response } from "express";
 import { errorResponse, successResponse } from "../../shared/util/response.util";
 import { ITodoService } from "../services/ITodo.service";
@@ -40,14 +39,26 @@ export class TodoController {
      *             schema:
      *               type: object
      *               properties:
-     *                 id:
-     *                   type: string
-     *                 title:
-     *                   type: string
-     *                 description:
-     *                   type: string
-     *                 completed:
+     *                 success:
      *                   type: boolean
+     *                   example: true
+     *                 statusCode:
+     *                   type: integer
+     *                   example: 201
+     *                 message:
+     *                   type: string
+     *                   example: "Todo created successfully"
+     *                 data:
+     *                   type: object
+     *                   properties:
+     *                     id:
+     *                       type: string
+     *                     title:
+     *                       type: string
+     *                     description:
+     *                       type: string
+     *                     completed:
+     *                       type: boolean
      *       400:
      *         description: Bad request (e.g., invalid input)
      *       500:
@@ -58,11 +69,7 @@ export class TodoController {
             const todo = await this.todoService.createTodo(req.body);
             successResponse(res, "Todo created successfully", todo, 201);
         } catch (error) {
-            if (error instanceof Error) {
-                errorResponse(res, "Failed to create todo", error);
-            } else {
-                errorResponse(res, "Failed to create todo", new Error("Unknown error"));
-            }
+            errorResponse(res, "Failed to create todo", error);
         }
     }
 
@@ -78,18 +85,30 @@ export class TodoController {
      *         content:
      *           application/json:
      *             schema:
-     *               type: array
-     *               items:
-     *                 type: object
-     *                 properties:
-     *                   id:
-     *                     type: string
-     *                   title:
-     *                     type: string
-     *                   description:
-     *                     type: string
-     *                   completed:
-     *                     type: boolean
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: true
+     *                 statusCode:
+     *                   type: integer
+     *                   example: 200
+     *                 message:
+     *                   type: string
+     *                   example: "Todos retrieved successfully"
+     *                 data:
+     *                   type: array
+     *                   items:
+     *                     type: object
+     *                     properties:
+     *                       id:
+     *                         type: string
+     *                       title:
+     *                         type: string
+     *                       description:
+     *                         type: string
+     *                       completed:
+     *                         type: boolean
      *       500:
      *         description: Internal server error
      */
@@ -98,11 +117,7 @@ export class TodoController {
             const todos = await this.todoService.getTodos();
             successResponse(res, "Todos retrieved successfully", todos);
         } catch (error) {
-            if (error instanceof Error) {
-                errorResponse(res, "Failed to get todos", error);
-            } else {
-                errorResponse(res, "Failed to get todos", new Error("Unknown error"));
-            }
+            errorResponse(res, "Failed to retrieve todos", error);
         }
     }
 
@@ -127,14 +142,26 @@ export class TodoController {
      *             schema:
      *               type: object
      *               properties:
-     *                 id:
-     *                   type: string
-     *                 title:
-     *                   type: string
-     *                 description:
-     *                   type: string
-     *                 completed:
+     *                 success:
      *                   type: boolean
+     *                   example: true
+     *                 statusCode:
+     *                   type: integer
+     *                   example: 200
+     *                 message:
+     *                   type: string
+     *                   example: "Todo retrieved successfully"
+     *                 data:
+     *                   type: object
+     *                   properties:
+     *                     id:
+     *                       type: string
+     *                     title:
+     *                       type: string
+     *                     description:
+     *                       type: string
+     *                     completed:
+     *                       type: boolean
      *       404:
      *         description: Todo not found
      *       500:
@@ -145,11 +172,7 @@ export class TodoController {
             const todo = await this.todoService.getTodoById(req.params.id);
             successResponse(res, "Todo retrieved successfully", todo);
         } catch (error) {
-            if (error instanceof Error) {
-                errorResponse(res, "Failed to get todo", error);
-            } else {
-                errorResponse(res, "Failed to get todo", new Error("Unknown error"));
-            }
+            errorResponse(res, "Failed to retrieve todo", error);
         }
     }
 
@@ -190,14 +213,26 @@ export class TodoController {
      *             schema:
      *               type: object
      *               properties:
-     *                 id:
-     *                   type: string
-     *                 title:
-     *                   type: string
-     *                 description:
-     *                   type: string
-     *                 completed:
+     *                 success:
      *                   type: boolean
+     *                   example: true
+     *                 statusCode:
+     *                   type: integer
+     *                   example: 200
+     *                 message:
+     *                   type: string
+     *                   example: "Todo updated successfully"
+     *                 data:
+     *                   type: object
+     *                   properties:
+     *                     id:
+     *                       type: string
+     *                     title:
+     *                       type: string
+     *                     description:
+     *                       type: string
+     *                     completed:
+     *                       type: boolean
      *       404:
      *         description: Todo not found
      *       400:
@@ -210,11 +245,7 @@ export class TodoController {
             const todo = await this.todoService.updateTodo(req.params.id, req.body);
             successResponse(res, "Todo updated successfully", todo);
         } catch (error) {
-            if (error instanceof Error) {
-                errorResponse(res, "Failed to update todo", error);
-            } else {
-                errorResponse(res, "Failed to update todo", new Error("Unknown error"));
-            }
+            errorResponse(res, "Failed to update todo", error);
         }
     }
 
@@ -234,6 +265,31 @@ export class TodoController {
      *     responses:
      *       200:
      *         description: Todo deleted successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: true
+     *                 statusCode:
+     *                   type: integer
+     *                   example: 200
+     *                 message:
+     *                   type: string
+     *                   example: "Todo deleted successfully"
+     *                 data:
+     *                   type: object
+     *                   properties:
+     *                     id:
+     *                       type: string
+     *                     title:
+     *                       type: string
+     *                     description:
+     *                       type: string
+     *                     completed:
+     *                       type: boolean
      *       404:
      *         description: Todo not found
      *       500:
@@ -244,11 +300,7 @@ export class TodoController {
             const todo = await this.todoService.deleteTodo(req.params.id);
             successResponse(res, "Todo deleted successfully", todo);
         } catch (error) {
-            if (error instanceof Error) {
-                errorResponse(res, "Failed to delete todo", error);
-            } else {
-                errorResponse(res, "Failed to delete todo", new Error("Unknown error"));
-            }
+            errorResponse(res, "Failed to delete todo", error);
         }
     }
 }

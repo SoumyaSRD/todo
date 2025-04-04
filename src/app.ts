@@ -2,7 +2,7 @@ import cors from "cors";
 import express from "express";
 import DefaultRouter from "./app.routes";
 import connectDB from "./config/dbconfig"; // Ensure default export in dbconfig.ts
-import { setupSwagger } from "./module/shared/middlewares/swagger.middleware";
+import { setupSwagger } from "./config/swagger.config";
 
 const app = express();
 

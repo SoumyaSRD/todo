@@ -1,15 +1,14 @@
 import { Express } from "express";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
-import { URL } from "../../../config/keys";
-
-const swaggerOptions = {
+import { URL } from "./keys";
+const options = {
     definition: {
-        openapi: "3.0.0",
+        openapi: '3.0.0',
         info: {
-            title: "Todo API",
-            version: "1.0.0",
-            description: "API documentation for the Todo application",
+            title: 'TODO API',
+            version: '1.0.0',
+            description: 'A simple TODO API',
         },
         servers: [{ url: URL, description: "Local server" }],
         components: {
@@ -31,7 +30,7 @@ const swaggerOptions = {
     apis: ["./src/**/*.ts"], // Include all TypeScript files in Swagger docs
 };
 
-const swaggerDocs = swaggerJsDoc(swaggerOptions);
+const swaggerDocs = swaggerJsDoc(options);
 
 export const setupSwagger = (app: Express) => {
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
