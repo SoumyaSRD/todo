@@ -1,89 +1,115 @@
-/**
- * The above functions in TypeScript generate success and error responses with customizable messages, data, and status codes for an Express server.
- * @param {Response} res - The `res` parameter in the functions `successResponse` and `errorResponse` is an instance of the Express `Response` object. It is used to send a response back to the client making the HTTP request.
- * @param {string} message - The `message` parameter in the `successResponse` and `errorResponse` functions is a string that represents the message or description associated with the response being sent back to the client. It typically provides information about the outcome of the request or any relevant details that the client needs to know.
- * @param {T | null} [data=null] - The `data` parameter in the `successResponse` function is used to provide additional data to be included in the response. It is a generic type `<T>` which means it can be of any type. In the function signature, it is set to `T | null`, which means it can
- * @param {number} [statusCode=200] - The `statusCode` parameter in the `successResponse` and `errorResponse` functions is used to specify the HTTP status code that will be returned in the response. By default, the `statusCode` is set to `200` for success responses and `400` for error responses. However, you
- * @returns The `successResponse` and `errorResponse` functions are returning a response object with a specific structure based on the provided data.
- */
 import { Response } from "express";
-import { ErrorResponse, SuccessResponse } from "../interfaces/response.interface";
 
+// Define generic response types
+interface SuccessResponse<T> {
+    success: true;
+    statusCode: number;
+    message: string;
+    data: T;
+}
+
+interface ErrorResponse<T> {
+    success: false;
+    statusCode: number;
+    message: string;
+    error?: any; // Optional detailed error object
+}
+
+/**
+ * Sends a success response with dynamic data and status code
+ * @param res Express Response object
+ * @param message Custom success message
+ * @param data Data to return (e.g., todo object or array)
+ * @param statusCode HTTP status code (defaults to 200)
+ */
 export const successResponse = <T>(
     res: Response,
-    message: string,
-    data: T | null = null,
+    message: string = "Request successful",
+    data: T,
     statusCode: number = 200
 ): Response<SuccessResponse<T>> => {
-    const response: SuccessResponse<T> = { statusCode, message, data };
+    const response: SuccessResponse<T> = {
+        success: true,
+        statusCode,
+        message,
+        data,
+    };
     return res.status(statusCode).json(response);
 };
 
+/**
+ * Sends an error response with dynamic error details and status code
+ * @param res Express Response object
+ * @param message Custom error message
+ * @param error Error object or details (optional)
+ * @param statusCode HTTP status code (defaults based on error type)
+ */
 export const errorResponse = <T>(
     res: Response,
-    message: string = '',
+    message: string = "An error occurred",
     error: any = null,
     statusCode: number = 0
 ): Response<ErrorResponse<T>> => {
-    console.error(`[ERROR] ${error}`);
+    console.error(`[ERROR] ${error?.message || error}`);
 
-    // Set default status code and message
+    // Determine status code and message based on error type
     statusCode = statusCode || error?.statusCode || 500;
-    message = statusCode === 500 ? "Internal Server Error" : message || error?.message || "Internal Server Error";
+    message = statusCode === 500 ? "Internal Server Error" : message || error?.message || "An error occurred";
 
-    // MongoDB Validation Error Handling
+    // Handle specific error cases
     if (error?.name === "ValidationError") {
         statusCode = 400;
-        message = "Invalid Data Provided";
+        message = message || "Invalid Data Provided";
+    } else if (error?.code === 11000) {
+        statusCode = 400;
+        message = message || "Duplicate Key Error";
+    } else if (error?.message === "Todo not found") {
+        statusCode = 404;
+        message = message || "Resource not found";
     }
 
-    // MongoDB Duplicate Key Error
-    if (error?.code === 11000) {
-        statusCode = 400;
-        message = "Duplicate Key Error";
-    }
-    const response: ErrorResponse<T> = { statusCode, message, error };
+    const response: ErrorResponse<T> = {
+        success: false,
+        statusCode,
+        message,
+        error: error ? { name: error.name, message: error.message, stack: error.stack } : undefined,
+    };
 
     return res.status(statusCode).json(response);
 };
-
-
 
 /**
  * Express Error Handling Middleware
  */
-const errorMiddleware = (
+export const errorMiddleware = (
     err: any,
     req: Request,
     res: Response,
     next: Function
 ) => {
-    console.error(`[ERROR] ${err.message}`);
+    console.error(`[ERROR] ${err.message || err}`);
 
-    // Set default status code and message
+    // Default values
     let statusCode = err.statusCode || 500;
     let message = err.message || "Internal Server Error";
 
-    // MongoDB Validation Error Handling
+    // Handle specific error cases
     if (err.name === "ValidationError") {
         statusCode = 400;
         message = "Invalid Data Provided";
-    }
-
-    // MongoDB Duplicate Key Error
-    if (err.code === 11000) {
+    } else if (err.code === 11000) {
         statusCode = 400;
         message = "Duplicate Key Error";
+    } else if (err.message === "Todo not found") {
+        statusCode = 404;
+        message = "Resource not found";
     }
 
-    // Send JSON Response
     res.status(statusCode).json({
         success: false,
         statusCode,
         message,
-        errors: err.errors || null,
+        error: err.errors || err.message || null,
     });
-    next()
+    next();
 };
-
-export default errorMiddleware;
