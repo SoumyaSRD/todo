@@ -1,20 +1,21 @@
-import { ITodo } from "../interfaces/todo.interface";
-import { TodoRepository } from "../repositories/todo.repository";
+import { IFilteredResponse } from "../../shared/interfaces/IFilteredResponse";
+import { handleServiceError } from "../../shared/util/custom-error.util";
+import { IFilterTodo, ITodo } from "../interfaces/todo.interface";
+import { ITodoRepository } from "../repositories/ITodo.repository";
 import { ITodoService } from "./ITodo.service";
 
 export class TodoService implements ITodoService {
-    private todoRepo: TodoRepository;
+    private todoRepo: ITodoRepository;
 
-    constructor(todoRepo?: TodoRepository) {
-        this.todoRepo = todoRepo || new TodoRepository();
+    constructor(todoRepo: ITodoRepository) {
+        this.todoRepo = todoRepo;
     }
 
     async createTodo(todo: ITodo): Promise<ITodo> {
         try {
             return await this.todoRepo.create(todo);
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-            throw new Error(`Failed to create todo: ${errorMessage}`);
+            throw handleServiceError("create todo", error);
         }
     }
 
@@ -22,8 +23,7 @@ export class TodoService implements ITodoService {
         try {
             return await this.todoRepo.findAll();
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-            throw new Error(`Failed to fetch todos: ${errorMessage}`);
+            throw handleServiceError("fetch todos", error);
         }
     }
 
@@ -33,19 +33,17 @@ export class TodoService implements ITodoService {
             if (!todo) throw new Error("Todo not found");
             return todo;
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-            throw new Error(`Failed to retrieve todo: ${errorMessage}`);
+            throw handleServiceError("retrieve todo", error);
         }
     }
 
-    async updateTodo(id: string, todo: Partial<ITodo>): Promise<ITodo> {
+    async updateTodo(todo: Partial<ITodo>): Promise<ITodo> {
         try {
-            const updatedTodo = await this.todoRepo.update(id, todo);
+            const updatedTodo = await this.todoRepo.update(todo?._id ? todo._id : '', todo);
             if (!updatedTodo) throw new Error("Todo not found");
             return updatedTodo;
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-            throw new Error(`Failed to update todo: ${errorMessage}`);
+            throw handleServiceError("update todo", error);
         }
     }
 
@@ -55,8 +53,15 @@ export class TodoService implements ITodoService {
             if (!deletedTodo) throw new Error("Todo not found");
             return deletedTodo;
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-            throw new Error(`Failed to delete todo: ${errorMessage}`);
+            throw handleServiceError("delete todo", error);
+        }
+    }
+
+    async filterTodos(filterPayload: IFilterTodo): Promise<IFilteredResponse<ITodo>> {
+        try {
+            return await this.todoRepo.filterTodos(filterPayload);
+        } catch (error) {
+            throw handleServiceError("filter todos", error);
         }
     }
 }

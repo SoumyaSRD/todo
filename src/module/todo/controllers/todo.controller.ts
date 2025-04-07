@@ -178,7 +178,7 @@ export class TodoController {
 
     /**
      * @swagger
-     * /todo/{id}:
+     * /todo:
      *   put:
      *     summary: Update a todo by ID
      *     tags: [Todo]
@@ -242,7 +242,7 @@ export class TodoController {
      */
     async updateTodo(req: Request, res: Response): Promise<void> {
         try {
-            const todo = await this.todoService.updateTodo(req.params.id, req.body);
+            const todo = await this.todoService.updateTodo(req.body);
             successResponse(res, "Todo updated successfully", todo);
         } catch (error) {
             errorResponse(res, "Failed to update todo", error);
@@ -301,6 +301,79 @@ export class TodoController {
             successResponse(res, "Todo deleted successfully", todo);
         } catch (error) {
             errorResponse(res, "Failed to delete todo", error);
+        }
+    }
+    /**
+     * @swagger
+     * /todo/filter:
+     *   post:
+     *     summary: Filter todos based on criteria
+     *     tags: [Todo]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               title:
+     *                 type: string
+     *                 example: "Read"
+     *               completed:
+     *                 type: boolean
+     *                 example: false
+     *               page:
+     *                 type: integer
+     *                 example: 1
+     *               limit:
+     *                 type: integer
+     *                 example: 10
+     *     responses:
+     *       200:
+     *         description: Todos filtered successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: true
+     *                 statusCode:
+     *                   type: integer
+     *                   example: 200
+     *                 message:
+     *                   type: string
+     *                   example: "Todo Filtered successfully"
+     *                 data:
+     *                   type: object
+     *                   properties:
+     *                     total:
+     *                       type: integer
+     *                       example: 2
+     *                     items:
+     *                       type: array
+     *                       items:
+     *                         type: object
+     *                         properties:
+     *                           id:
+     *                             type: string
+     *                           title:
+     *                             type: string
+     *                           description:
+     *                             type: string
+     *                           completed:
+     *                             type: boolean
+     *       500:
+     *         description: Internal server error
+     */
+
+    async filterTodos(req: Request, res: Response): Promise<void> {
+        try {
+            const todos = await this.todoService.filterTodos(req.body);
+            successResponse(res, "Todo Filtered successfully", todos);
+        } catch (error) {
+            errorResponse(res, "Failed to Filter todo", error);
         }
     }
 }

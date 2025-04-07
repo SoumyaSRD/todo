@@ -1,3 +1,4 @@
+
 export interface ITodo extends Document {
     _id?: string;
     title: string;
@@ -6,3 +7,9 @@ export interface ITodo extends Document {
     createdAt?: Date;
     updatedAt?: Date;
 }
+
+export interface IFilterTodo extends Partial<ITodo> {
+    page: number;
+    limit: number
+}
+

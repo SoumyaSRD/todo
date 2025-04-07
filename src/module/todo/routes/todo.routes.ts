@@ -14,7 +14,8 @@ const todoController = new TodoController(todoService);
 TodoRoutes.post("", todoController.createTodo.bind(todoController));
 TodoRoutes.get("", todoController.getTodos.bind(todoController));
 TodoRoutes.get("/:id", todoController.getTodoById.bind(todoController));
-TodoRoutes.put("/:id", todoController.updateTodo.bind(todoController));
+TodoRoutes.put("", todoController.updateTodo.bind(todoController));
 TodoRoutes.delete("/:id", todoController.deleteTodo.bind(todoController));
+TodoRoutes.post("/filter", todoController.filterTodos.bind(todoController));
 
 export default TodoRoutes;

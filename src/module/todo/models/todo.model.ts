@@ -4,7 +4,7 @@ import { ITodo } from "../interfaces/todo.interface";
 
 const TodoSchema: Schema = new Schema({
     title: { type: String, required: true },
-    desciption: { type: String },
+    description: { type: String },
     completed: { type: Boolean, default: false },
 },
     {

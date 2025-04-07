@@ -1,10 +1,10 @@
-import { ITodo } from "../interfaces/todo.interface";
+import { IFilteredResponse } from "../../shared/interfaces/IFilteredResponse";
+import { IRepository } from "../../shared/interfaces/IRepository";
+import { IFilterTodo, ITodo } from "../interfaces/todo.interface";
 
 
-export interface ITodoRepository {
-    create(todo: ITodo): Promise<ITodo>;
-    findAll(): Promise<ITodo[]>;
-    findById(id: string): Promise<ITodo | null>;
-    update(id: string, todo: Partial<ITodo>): Promise<ITodo | null>;
-    delete(id: string): Promise<ITodo | null>;
+export interface ITodoRepository extends IRepository<ITodo> {
+    filterTodos(
+        filterPayload: IFilterTodo
+    ): Promise<IFilteredResponse<ITodo>>
 }
